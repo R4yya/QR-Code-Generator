@@ -376,6 +376,10 @@ class QRCodeGenerator:
         # Implement alphanumeric data encoding logic
         aplhanumeric_charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
 
+        # Check if input data contains only alphanumeric characters
+        if any(char not in alphanumeric_charset for char in self.data):
+            raise ValueError('Invalid input data. Alphanumeric encoding mode requires alphanumeric characters only.')
+
         # Initialize encoded data string
         encoded_data = ''
 
