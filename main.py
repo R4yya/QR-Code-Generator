@@ -1,8 +1,8 @@
 # main.py
 
 class QRCodeGenerator:
-    NUMERIC_CHARSET = set("0123456789")
-    ALPHANUMERIC_CHARSET = set("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:")
+    NUMERIC_CHARSET = set('0123456789')
+    ALPHANUMERIC_CHARSET = set('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:')
 
     def __init__(self, data):
         self.data = data
@@ -34,7 +34,7 @@ class QRCodeGenerator:
             pass
 
         # If none of the above conditions are met, raise an error
-        raise ValueError("Unable to determine the best encoding mode for the input string.")
+        raise ValueError('Unable to determine the best encoding mode for the input string.')
 
     def encode_numeric(self,):
         # Check if input data contains only numeric characters
