@@ -4,7 +4,7 @@ class QRCodeGenerator:
     # Constants
     NUMERIC_CHARSET = set('0123456789')
     ALPHANUMERIC_CHARSET = set('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:')
-    MODE_IDICATOR = {
+    ENCODING_MODE_IDICATOR = {
         'numeric': '0001',
         'alpanumeric': '0010',
         'byte': '0011',
@@ -41,6 +41,37 @@ class QRCodeGenerator:
 
         # If none of the above conditions are met, raise an error
         raise ValueError('Unable to determine the best encoding mode for the input string.')
+
+    def determine_character_count_indicator_bits(self):
+        # Determine CCI bits count according to the QR Code version
+        match self.encoding_mode:
+            case 'numeric':
+                if self.version in range(1, 10):
+                    return 10
+                elif self.version in range(10, 27):
+                    return 12
+                elif self.version in range(27, 41):
+                    return 14
+            case 'alphanumeric':
+                if self.version in range(1, 10):
+                    return 9
+                elif self.version in range(10, 27):
+                    return 11
+                elif self.version in range(27, 41):
+                    return 13
+            case 'byte':
+                if self.version in range(1, 10):
+                    return 8
+                elif self.version in range(10, 41):
+                    return 16
+            case _:
+                raise ValueError(f'Invalid encoding mode: {self.encoding_mode}')
+
+    def get_character_count_indicator(self):
+        # Convert data length to binary - get CCI
+        character_count_indicator = format(len(self.data), f'0{determine_character_count_indicator_bits()}b')
+
+        return character_count_indicator
 
     def encode_numeric(self,):
         # Check if input data contains only numeric characters
@@ -79,7 +110,7 @@ class QRCodeGenerator:
         encoded_data = ''
 
         # Divide data into groups of two characters
-        groups = [self.data[i:i+2] for i in range(0, len(self.data), 2)]
+        groups = [self.data[i:i+ol2] for i in range(0, len(self.data), 2)]
 
         for group in groups:
             # Convert group to 11-bit or 6-bit binary
@@ -119,7 +150,7 @@ class QRCodeGenerator:
             case 'byte':
                 return self.encode_byte()
             case _:
-                raise ValueError(f'Unknown encoding mode: {self.encoding_mode}')
+                raise ValueError(f'Invalid encoding mode: {self.encoding_mode}')
 
     def generate_matrix(self, encoded_data):
         # Generate QR code matrix based on encoded data
