@@ -374,7 +374,7 @@ class QRCodeGenerator:
 
     def encode_alphanumeric(self):
         # Implement alphanumeric data encoding logic
-        aplhanumeric_charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
+        alphanumeric_charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
 
         # Check if input data contains only alphanumeric characters
         if any(char not in alphanumeric_charset for char in self.data):
@@ -391,12 +391,12 @@ class QRCodeGenerator:
             # depending on len(group) - count of digits
             match len(group):
                 case 2:
-                    index1 = aplhanumeric_charset.index(group[0])
-                    index2 = aplhanumeric_charset.index(group[1])
+                    index1 = alphanumeric_charset.index(group[0])
+                    index2 = alphanumeric_charset.index(group[1])
 
                     encoded_group = format(index1 * 45 + index2, '011b')
                 case 1:
-                    encoded_group = format(aplhanumeric_charset.index(group[0]), '06b')
+                    encoded_group = format(alphanumeric_charset.index(group[0]), '06b')
                 case _:
                     raise ValueError(f'Invalid data group size: {len(group)}')
 
