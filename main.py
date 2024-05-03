@@ -277,9 +277,9 @@ class QRCodeGenerator:
             self.encoding_mode = 'alphanumeric'
             return
 
-        # Check if input string can be encoded in ISO 8859-1 (Latin-1)
+        # Check if input string can be encoded in UTF-8
         try:
-            self.data.encode('latin-1')
+            self.data.encode('utf-8')
             self.encoding_mode = 'byte'
             return
         except UnicodeEncodeError:
