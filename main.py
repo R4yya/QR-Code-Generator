@@ -1,7 +1,11 @@
 # main.py
 
 class QRCodeGenerator:
-    def __init__(self):
+    NUMERIC_CHARSET = set("0123456789")
+    ALPHANUMERIC_CHARSET = set("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:")
+
+    def __init__(self, data):
+        self.data = data
         self.version = None
         self.encoding_mode = None
         self.error_correction = None
@@ -10,16 +14,38 @@ class QRCodeGenerator:
         self.mask_pattern = None
         self.image_factory = None
 
-    def encode_numeric(self, data):
+    def determine_best_encoding_mode(self):
+        # Check if input string consists of only decimal digits
+        if all(char in self.NUMERIC_CHARSET for char in self.data):
+            self.encoding_mode = 'numeric'
+            return
+
+        # Check if input string can be encoded in alphanumeric mode
+        if all(char in self.ALPHANUMERIC_CHARSET for char in self.data.upper()):
+            self.encoding_mode = 'alphanumeric'
+            return
+
+        # Check if input string can be encoded in ISO 8859-1 (Latin-1)
+        try:
+            self.data.encode('latin-1')
+            self.encoding_mode = 'byte'
+            return
+        except UnicodeEncodeError:
+            pass
+
+        # If none of the above conditions are met, raise an error
+        raise ValueError("Unable to determine the best encoding mode for the input string.")
+
+    def encode_numeric(self,):
         # Check if input data contains only numeric characters
-        if not data.isdigit():
+        if not self.data.isdigit():
             raise ValueError('Invalid input data. Numeric encoding mode requires numeric characters only.')
 
         # Implement numeric data encoding logic
         encoded_data = ''
 
         # Split digit data into groups of three or less
-        groups = [data[i:i+3] for i in range(0, len(data), 3)]
+        groups = [self.data[i:i+3] for i in range(0, len(self.data), 3)]
 
         # Convert each group to binary
         for group in groups:
@@ -39,7 +65,7 @@ class QRCodeGenerator:
 
         return encoded_data
 
-    def encode_alphanumeric(self, data):
+    def encode_alphanumeric(self):
         # Implement alphanumeric data encoding logic
         aplhanumeric_charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:'
 
@@ -47,7 +73,7 @@ class QRCodeGenerator:
         encoded_data = ''
 
         # Divide data into groups of two characters
-        groups = [data[i:i+2] for i in range(0, len(data), 2)]
+        groups = [self.data[i:i+2] for i in range(0, len(self.data), 2)]
 
         for group in groups:
             # Convert group to 11-bit or 6-bit binary
@@ -67,25 +93,25 @@ class QRCodeGenerator:
 
         return encoded_data
 
-    def encode_byte(self, data):
+    def encode_byte(self):
         # Implement binary data encoding logic
         # Encode data in UTF-8 byte mode
-        utf8_encoded_data = data.encode('utf-8')
+        utf8_encoded_data = self.data.encode('utf-8')
 
         # Convert each byte into binary and pad to 8 bits
         encoded_data = ''.join(format(byte, '08b') for byte in utf8_encoded_data)
 
         return encoded_data
 
-    def encode_data(self, data):
-        # Determine encoding mode based on data type
+    def encode_data(self):
+        # Determine encoding mode based on choosen option
         match self.encoding_mode:
             case 'numeric':
-                return self.encode_numeric(data)
+                return self.encode_numeric()
             case 'alphanumeric':
-                return self.encode_alphanumeric(data)
+                return self.encode_alphanumeric()
             case 'byte':
-                return self.encode_byte(data)
+                return self.encode_byte()
             case _:
                 raise ValueError(f'Unknown encoding mode: {self.encoding_mode}')
 
@@ -123,6 +149,6 @@ class QRCodeGenerator:
 
 
 if __name__ == '__main__':
-    generator = QRCodeGenerator()
-    generator.encoding_mode = 'byte'
-    print(generator.encode_data('ALEK'))
+    generator = QRCodeGenerator('test?')
+    generator.determine_best_encoding_mode()
+    print(generator.encoding_mode)
