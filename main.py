@@ -1,8 +1,14 @@
 # main.py
 
 class QRCodeGenerator:
+    # Constants
     NUMERIC_CHARSET = set('0123456789')
     ALPHANUMERIC_CHARSET = set('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:')
+    MODE_IDICATOR = {
+        'numeric': '0001',
+        'alpanumeric': '0010',
+        'byte': '0011',
+    }
 
     def __init__(self, data):
         self.data = data
