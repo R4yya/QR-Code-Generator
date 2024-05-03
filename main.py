@@ -422,6 +422,22 @@ class QRCodeGenerator:
             case _:
                 raise ValueError(f'Invalid encoding mode: {self.encoding_mode}')
 
+    def get_emi_cci_data_sequence(self):
+        # Obtaining a string of bits that consists of the EMI, the character count indicator, and the data bits
+        emi_cci_data_sequence = self.get_encoding_mode_indicator() + self.get_character_count_indicator() + self.encode_data()
+
+        # Calculate the length of the encoded data along with EMI and CCI
+        total_length = len(emi_cci_data_sequence)
+
+        # Check if the total length is not a multiple of 8
+        padding_needed = 8 - (total_length % 8) if total_length % 8 != 0 else 0
+
+        # Add padding zeros if needed
+        if padding_needed > 0:
+            emi_cci_data_sequence += '0' * padding_needed
+
+        return emi_cci_data_sequence
+
     def generate_matrix(self, encoded_data):
         # Generate QR code matrix based on encoded data
         # Determine QR code size based on version and encoding mode
@@ -460,6 +476,5 @@ if __name__ == '__main__':
     generator.determine_best_encoding_mode()
     print(generator.encoding_mode)
     generator.determine_smallest_version()
-    encoded_data = generator.get_encoding_mode_indicator()+generator.get_character_count_indicator()+generator.encode_data()
-    print(encoded_data)
-    print(len(encoded_data))
+    print(generator.get_emi_cci_data_sequence())
+    print(len(generator.get_emi_cci_data_sequence()))
