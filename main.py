@@ -377,7 +377,7 @@ class QRCodeGenerator:
         encoded_data = ''
 
         # Divide data into groups of two characters
-        groups = [self.data[i:i+ol2] for i in range(0, len(self.data), 2)]
+        groups = [self.data[i:i+2] for i in range(0, len(self.data), 2)]
 
         for group in groups:
             # Convert group to 11-bit or 6-bit binary
