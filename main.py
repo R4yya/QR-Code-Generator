@@ -9,7 +9,7 @@ class QRCodeGenerator:
     ENCODING_MODE_INDICATOR = {
         'numeric': '0001',
         'alphanumeric': '0010',
-        'byte': '0011',
+        'byte': '0100',
     }
 
     # Version -> Error Correction Level -> Encoding Mode -> Allowed Data chars count
