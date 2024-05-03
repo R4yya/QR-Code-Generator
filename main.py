@@ -8,7 +8,7 @@ class QRCodeGenerator:
 
     ENCODING_MODE_INDICATOR = {
         'numeric': '0001',
-        'alpanumeric': '0010',
+        'alphanumeric': '0010',
         'byte': '0011',
     }
 
@@ -273,7 +273,7 @@ class QRCodeGenerator:
             return
 
         # Check if input string can be encoded in alphanumeric mode
-        if all(char in self.ALPHANUMERIC_CHARSET for char in self.data.upper()):
+        if all(char in self.ALPHANUMERIC_CHARSET for char in self.data):
             self.encoding_mode = 'alphanumeric'
             return
 
@@ -287,6 +287,9 @@ class QRCodeGenerator:
 
         # If none of the above conditions are met, raise an error
         raise ValueError('Unable to determine the best encoding mode for the input string.')
+
+    def get_encoding_mode_indicator(self):
+        return self.ENCODING_MODE_INDICATOR[self.encoding_mode]
 
     def determine_smallest_version(self):
         # Calculate data length
@@ -336,7 +339,7 @@ class QRCodeGenerator:
 
     def get_character_count_indicator(self):
         # Convert data length to binary - get CCI
-        character_count_indicator = format(len(self.data), f'0{determine_character_count_indicator_bits()}b')
+        character_count_indicator = format(len(self.data), f'0{self.determine_character_count_indicator_bits()}b')
 
         return character_count_indicator
 
@@ -453,7 +456,10 @@ class QRCodeGenerator:
 
 
 if __name__ == '__main__':
-    generator = QRCodeGenerator('test?test?test?test?test?test?', error_correction='L')
+    generator = QRCodeGenerator('test', error_correction='L')
     generator.determine_best_encoding_mode()
+    print(generator.encoding_mode)
     generator.determine_smallest_version()
-    print(generator.version)
+    encoded_data = generator.get_encoding_mode_indicator()+generator.get_character_count_indicator()+generator.encode_data()
+    print(encoded_data)
+    print(len(encoded_data))
