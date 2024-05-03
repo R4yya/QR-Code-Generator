@@ -288,6 +288,21 @@ class QRCodeGenerator:
         # If none of the above conditions are met, raise an error
         raise ValueError('Unable to determine the best encoding mode for the input string.')
 
+    def determine_smallest_version(self):
+        # Calculate data length
+        data = self.data
+        data_length = len(data)
+
+        # Iterate through QR code versions to find the smallest version that can accommodate the data
+        for version, capacities in self.CAPACITIES_TABLE.items():
+            # Check if the data length fits within the capacity for the chosen error correction level and encoding mode
+            capacity = capacities[self.error_correction][self.encoding_mode]
+            if data_length <= capacity:
+                self.version = version
+                return
+
+        raise ValueError("Data exceeds the capacity of all QR code versions.")
+
     def determine_character_count_indicator_bits(self):
         # Determine CCI bits count according to the QR Code version
         match self.encoding_mode:
@@ -432,6 +447,7 @@ class QRCodeGenerator:
 
 
 if __name__ == '__main__':
-    generator = QRCodeGenerator('test?')
+    generator = QRCodeGenerator('test?test?test?test?test?test?', error_correction='L')
     generator.determine_best_encoding_mode()
-    print(generator.encoding_mode)
+    generator.determine_smallest_version()
+    print(generator.version)
