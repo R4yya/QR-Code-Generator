@@ -13,7 +13,11 @@ class QRCodeGenerator:
         'byte': '0100',
     }
 
-    # Version -> Error Correction Level -> Encoding Mode/Max possible -> Allowed Data chars count
+    # Data capacity for all possible QR Codes
+    # L | numeric, alphanumeric, byte, max_bits -> data capacity
+    # M | numeric, alphanumeric, byte, max_bits -> data capacity
+    # Q | numeric, alphanumeric, byte, max_bits -> data capacity
+    # H | numeric, alphanumeric, byte, max_bits -> data capacity
     CAPACITIES_TABLE = {
         1: {
             'L': {'numeric': 41, 'alphanumeric': 25, 'byte': 17, 'max_bits': 152},
@@ -505,7 +509,6 @@ class QRCodeGenerator:
             "H": [30, 20, 15, 61, 16],
         },
     }
-
 
     def __init__(self, data, error_correction='H'):
         self.data = data
