@@ -1515,21 +1515,21 @@ class QRCodeGenerator:
         # Given number of error correction symbols
         nsym = self.ECCWBI[self.version][self.error_correction][0]
 
-        if (len(msg_in) + nsym) > 255: 
-            raise ValueError(f'Message is too long ({len(msg_in) + nsym} when max is 255)')
-
         # Generator polynomial
         gen = self.GENERATOR_POLYNOMIALS[nsym]
-
-        # Init msg_out with the values inside msg_in and pad with len(gen)-1 bytes (which is the number of ecc symbols).
-        msg_out = bytearray(msg_in) + bytearray(len(gen)-1)
-
-        # Precompute the logarithm of every items in the generator
-        lgen = bytearray([self.GALOIS_LOG[gen[j]] for j in range(len(gen))])
 
         # Cache lengths for faster access inside loops
         msg_in_len = len(msg_in)
         gen_len = len(gen)
+
+        if (msg_in_len + nsym) > 255: 
+            raise ValueError(f'Message is too long ({msg_in_len + nsym} when max is 255)')
+
+        # Init msg_out with the values inside msg_in and pad with len(gen)-1 bytes (which is the number of ecc symbols).
+        msg_out = bytearray(msg_in) + bytearray(gen_len-1)
+
+        # Precompute the logarithm of every items in the generator
+        lgen = bytearray([self.GALOIS_LOG[gen[j]] for j in range(len(gen))])
 
         # Synthetic division main loop
         for i in range(msg_in_len):
