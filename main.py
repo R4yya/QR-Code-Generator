@@ -1546,10 +1546,33 @@ class QRCodeGenerator:
 
         msg_out_bin_repr = ''.join(format(byte, '08b') for byte in msg_out)
 
-        splitted_bin_msg_out = [msg_out_bin_repr[i:i+8] for i in range(0, len(msg_out_bin_repr), 8)]
-        int_msg_out = [int(i, 2) for i in splitted_bin_msg_out] # Converted list of int
+        # splitted_bin_msg_out = [msg_out_bin_repr[i:i+8] for i in range(0, len(msg_out_bin_repr), 8)]
+        # int_msg_out = [int(i, 2) for i in splitted_bin_msg_out] # Converted list of int
 
         return msg_out_bin_repr
+
+    def divide_data_into_blocks(self, encoded_data):
+        # Determine the number of blocks and error correction codewords for each block
+        # depending on version and error correction
+        ecc_info = self.ECCWBI[self.version][self.error_correction]
+
+        # Number of error correction codes per block
+        ec_codewords_per_block = ecc_info[0]
+        
+        # Info abount block count and number of data code words per block
+        # [(block1_count, block1_data_code_words),(block2_count, block2_data_code_words)]
+        block_info = [(ecc_info[i], ecc_info[i + 1]) for i in range(1, len(ecc_info), 2)]
+
+        # Divide the encoded data into blocks
+        blocks = []
+        start_index = 0
+        for ec_count, data_count in block_info:
+            block = encoded_data[start_index:start_index + data_count]
+            blocks.append((block, ec_count))
+            start_index += data_count
+
+        return blocks
+
 
     def generate_matrix(self, encoded_data):
         # Generate QR code matrix based on encoded data
