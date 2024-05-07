@@ -1502,15 +1502,17 @@ class QRCodeGenerator:
         # Pad encoded data if necessary
         padded_encoded_data = self.pad_encoded_data(emi_cci_data_sequence, required_bits)
 
-        return padded_encoded_data
+        # Convert to bytearray
+        splitted_padded_encoded_data = [padded_encoded_data[i:i+8] for i in range(0, len(padded_encoded_data), 8)]
+        int_padded_encoded_data = [int(i, 2) for i in splitted_padded_encoded_data]
+        final_data_sequence = bytearray(int_padded_encoded_data)
+
+        return final_data_sequence
 
     def rs_encode_data(self):
         '''Reed-Solomon main encoding function, using polynomial division (algorithm Extended Synthetic Division)'''
         # Original message
-        raw_msg_in = self.get_emi_cci_data_sequence()
-        splitted_msg_in = [raw_msg_in[i:i+8] for i in range(0, len(raw_msg_in), 8)]
-        int_msg_in = [int(i, 2) for i in splitted_msg_in]
-        msg_in = bytearray(int_msg_in)
+        msg_in = self.get_emi_cci_data_sequence()
 
         # Given number of error correction symbols
         nsym = self.ECCWBI[self.version][self.error_correction][0]
@@ -1544,12 +1546,7 @@ class QRCodeGenerator:
         # Recopy the original message bytes (overwrites the part where the quotient was computed)
         msg_out[:msg_in_len] = msg_in # Bytarray format
 
-        msg_out_bin_repr = ''.join(format(byte, '08b') for byte in msg_out)
-
-        # splitted_bin_msg_out = [msg_out_bin_repr[i:i+8] for i in range(0, len(msg_out_bin_repr), 8)]
-        # int_msg_out = [int(i, 2) for i in splitted_bin_msg_out] # Converted list of int
-
-        return msg_out_bin_repr
+        return msg_out
 
     def divide_data_into_blocks(self, encoded_data):
         # Determine the number of blocks and error correction codewords for each block
